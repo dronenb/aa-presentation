@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-service
+  namespace: minecraft
+  labels:
+    app.kubernetes.io/instance: minecraft
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: minecraft-port
+      port: 25565
+      protocol: TCP
+      targetPort: minecraft-port
+  selector:
+    app: minecraft

@@ -1,0 +1,53 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: minecraft-statefulset
+  namespace: minecraft
+  labels:
+    app: minecraft
+    app.kubernetes.io/instance: minecraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minecraft
+  template:
+    metadata:
+      labels:
+        app: minecraft
+    spec:
+      hostNetwork: true
+      serviceAccountName: minecraft-sa
+      containers:
+        - name: minecraft
+          image: itzg/minecraft-server:latest
+          env:
+            - name: EULA
+              value: "TRUE"
+          ports:
+            - name: minecraft-port
+              containerPort: 25565
+              protocol: TCP
+          securityContext:
+            privileged: false
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 3Gi
+            requests:
+              cpu: 500m
+              memory: 2Gi
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: minecraft-pvc
+              mountPath: /data
+            # - name: minecraft-server-properties-volume
+            #   mountPath: /data/server.properties
+            #   subPath: server.properties
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      hostname: minecraft
+      volumes:
+        - name: minecraft-pvc
+          persistentVolumeClaim:
+            claimName: minecraft-pvc
